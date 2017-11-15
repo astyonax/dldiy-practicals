@@ -13,3 +13,4 @@ If you spot any errors or if you have suggestions from improving this content, p
 ---
 
 PyTorch Tuturials: http://pytorch.org/tutorials/
+Course Webpage: http://www.di.ens.fr/~lelarge/dldiy/
