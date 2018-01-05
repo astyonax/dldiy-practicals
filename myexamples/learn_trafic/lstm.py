@@ -5,8 +5,11 @@ from torch import nn
 import torch
 from sklearn.preprocessing import RobustScaler
 from tqdm import trange
-
+import warnings
+import os
 # load data file
+warnings.warn('fitting only on closing price')
+# time_series = np.load(open('../data/offline_prices.npy','r'))[:,:,-1]
 time_series = np.load(open('data/time_series_traffic_paris.npy','r'))
 
 # scale data
@@ -14,7 +17,7 @@ scaler = RobustScaler()
 Q = scaler.fit_transform(time_series)
 
 # Hyper Parameters
-WEIGHT_DECAY = 1e-3
+WEIGHT_DECAY = 1e-5
 NESTEROV = True
 MOMENTUM = 0.9
 BATCH_SIZE = 600
@@ -45,7 +48,7 @@ def validate(Q,model,W):
     real = []
     pred = []
     model.eval()
-    for i in xrange(W,Q.shape[0]-1):
+    for i in xrange(W,min(Q.shape[0]-1,200)): # min to limit time spent on this
         t0 = Q[i-W:i]
         t1 = Q[i]
         t1_pred = model(np2y(t0)).squeeze().data.numpy()
@@ -132,38 +135,57 @@ class RNN(nn.Module):
                                nesterov=NESTEROV)
 
 # main
-def main(W,HIDDEN_DIM):
+def main(W,HIDDEN_DIM,EPOCHS,EV=1000):
     # os stuff
     DIR = '{}_{}/'.format(W,HIDDEN_DIM)
-    import os
+    print DIR
+
+    already_done_epochs = 0
     try:
         os.makedirs(DIR)
     except OSError:
-        import warnings
-        warnings.warn("overwriting previous files in folder "+DIR)
-    #
+        # warnings.warn("overwriting previous files in folder "+DIR)
+        try:
+            already_done_epochs = int(open(DIR+'/epoch').read())
+            warnings.warn('found {0:d} epochs done'.format(already_done_epochs))
+        except IOError:
+            pass
+    # load from last epoch
+    oDIR = DIR + '/{0:d}_epochs/'.format(already_done_epochs)
     try:
-        rnn = torch.load(DIR+'model.pth')
-        warnings.warn('Loaded trained model')
+        rnn = torch.load(oDIR+'model.pth')
+        warnings.warn('Continuing with previous training up to {EPOCHS:d} epochs'.format(EPOCHS=EPOCHS))
     except:
+        warnings.warn('Starting a new training sequence from scratch')
         rnn = RNN(FEATURES,hidden_dim=HIDDEN_DIM)
-    # train
+        already_done_epochs = 0
+
     rnn.lr=0.1
-    train_history = new_train_model(batch_gen,Q,rnn,epochs=3000,ev=500,window_size=W)
-    # validate
-    validation = validate(Q,rnn,W)[1]
-    # package output
-    # save model
-    torch.save(rnn,DIR+'model.pth')
-    # save validation
-    np.savez(open(DIR+'validation.npz','wb'),**validation)
-    # save log train_history
-    with open(DIR + 'train_history.txt','w') as fout:
-        fout.write(train_history)
+    for millennium in xrange(already_done_epochs,EPOCHS,EV):
+        print millennium,'->',millennium + EV
+        # train
+        train_history = new_train_model(batch_gen,Q,rnn,epochs=EV,ev=EV/2,window_size=W)
+        # validate
+        validation = validate(Q,rnn,W)[1]
+        # package output
+        oDIR = DIR + '/{0:d}_epochs/'.format(millennium+EV)
+        try:
+            os.makedirs(oDIR)
+        except OSError:
+            pass
+        # save model
+        torch.save(rnn,oDIR+'model.pth')
+        # save validation
+        np.savez(open(oDIR+'validation.npz','wb'),**validation)
+        # save log train_history
+        with open(oDIR + 'train_history.txt','w') as fout:
+            fout.write(train_history)
 
-    with open(DIR + 'torch_version','w') as fout:
-        fout.write(torch.__version__+'\n')
+        with open(oDIR + 'torch_version','w') as fout:
+            fout.write(torch.__version__+'\n')
 
+        with open(DIR+'epoch','w') as fout:
+            fout.write(str(millennium+EV))
 
 if __name__ == '__main__':
     from fire import Fire
