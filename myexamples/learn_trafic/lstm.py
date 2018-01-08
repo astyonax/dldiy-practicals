@@ -129,8 +129,11 @@ class RNN(nn.Module):
         output = self.lin_in(c)
         output,hidden = self.cell(output,hidden)
         output = self.lin_out(output)
+
         # print output.size()
-        # output = output.max(dim=1)[0]
+        if output.size()[1]>1:
+            output = output.max(dim=1)[0]
+        # print output.size()
         return output
 
     @property
@@ -159,9 +162,11 @@ class RNN(nn.Module):
                                nesterov=NESTEROV)
 
 # main
-def main(WINDOW,HIDDEN_DIM,EPOCHS,WEIGHT_DECAY,EV=1000):
+def main(WINDOW,HIDDEN_DIM,EPOCHS,WEIGHT_DECAY,EV=1000,prefix=''):
     # os stuff
     DIR = '{}_{}_{}/'.format(WINDOW,HIDDEN_DIM,WEIGHT_DECAY)
+    if prefix:
+        DIR = prefix + '/' + DIR
     print DIR
 
     already_done_epochs = 0
@@ -182,14 +187,15 @@ def main(WINDOW,HIDDEN_DIM,EPOCHS,WEIGHT_DECAY,EV=1000):
         logging.warning('Continuing with previous training up to {EPOCHS:d} epochs'.format(EPOCHS=EPOCHS))
     except:
         logging.warning('Starting a new training sequence from scratch')
-        rnn = RNN(FEATURES,hidden_dim=HIDDEN_DIM,weight_decay=WEIGHT_DECAY)
+        rnn = RNN(FEATURES,hidden_dim=HIDDEN_DIM,weight_decay=np.exp(WEIGHT_DECAY))
         already_done_epochs = 0
 
     rnn.lr=LR
+    EV = min(EV,EPOCHS)
     for millennium in xrange(already_done_epochs,EPOCHS,EV):
         print millennium,'->',millennium + EV
         # train
-        train_history = train_model(batch_gen,Q,rnn,epochs=EV,ev=EV/2,window_size=WINDOW)
+        train_history = train_model(batch_gen,Q,rnn,epochs=EPOCHS,ev=EV/2,window_size=WINDOW)
         # validate
         fitness, validation = validate(Q,rnn,WINDOW)
         # package output
