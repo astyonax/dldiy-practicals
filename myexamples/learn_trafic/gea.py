@@ -28,7 +28,7 @@ GENE_CFG = {'WINDOW' : [2,24,muldiv,1.5,int],
         'HIDDEN_DIM' : [1,32,muldiv,1.5,int],
         'WEIGHT_DECAY' : [-10,1,muldiv,1.5,int]
         }
-EPOCHS = 200
+EPOCHS = 1000
 PREFIX = 'GEA'
 # config ends here
 def individual():

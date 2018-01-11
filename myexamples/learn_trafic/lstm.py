@@ -195,7 +195,7 @@ def main(WINDOW,HIDDEN_DIM,EPOCHS,WEIGHT_DECAY,EV=1000,prefix=''):
     for millennium in xrange(already_done_epochs,EPOCHS,EV):
         print millennium,'->',millennium + EV
         # train
-        train_history = train_model(batch_gen,Q,rnn,epochs=EPOCHS,ev=EV/2,window_size=WINDOW)
+        train_history = train_model(batch_gen,Q,rnn,epochs=EV,ev=EV/2,window_size=WINDOW)
         # validate
         fitness, validation = validate(Q,rnn,WINDOW)
         # package output

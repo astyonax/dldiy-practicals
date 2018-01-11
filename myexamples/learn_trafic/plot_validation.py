@@ -1,8 +1,11 @@
 #!/bin/env python
 
+import matplotlib
+matplotlib.use('Agg')
 import pylab as plt
 import numpy as np
 import sys
+
 
 if __name__ == '__main__':
     fin = sys.argv[1]
