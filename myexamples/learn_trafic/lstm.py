@@ -11,8 +11,8 @@ import os
 # load data file
 time_series = np.load(open('data/time_series_traffic_paris.npy','r'))
 h = np.arange(time_series.shape[0],dtype=np.float32)%24
-ch = np.cos(h/24.)
-sh = np.sin(h/24.)
+ch = np.cos(h/24.)**2 # >0
+sh = np.sin(h/24.)**2 # >0
 time_series = np.c_[h,ch,sh,time_series]
 print time_series.shape
 # exit()
@@ -113,6 +113,7 @@ class RNN(nn.Module):
         self._hidden_dim = hidden_dim
         self.lin_in = nn.Linear(features,hidden_dim)
         self.cell = nn.LSTM(input_size=hidden_dim, hidden_size=hidden_dim, batch_first=True)
+        self.cell2 = nn.LSTM(input_size=hidden_dim, hidden_size=hidden_dim, batch_first=True)
         self.lin_out = nn.Linear(hidden_dim,features)
 
         # functions
@@ -126,8 +127,12 @@ class RNN(nn.Module):
         hidden = (Variable(torch.zeros(1,1,self._hidden_dim)),
                   Variable(torch.zeros(1,1,self._hidden_dim)))
 
+        hidden2 = (Variable(torch.zeros(1,1,self._hidden_dim)),
+                  Variable(torch.zeros(1,1,self._hidden_dim)))
+                  
         output = self.lin_in(c)
         output,hidden = self.cell(output,hidden)
+        output,hidden2 = self.cell(output,hidden2)
         output = self.lin_out(output)
 
         # print output.size()
