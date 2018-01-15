@@ -1,11 +1,13 @@
 # Modeling Paris traffic
 
-After my previous two studies on `traveling times in Paris` and `traffic in Paris` it is time to model the traffic in Paris. As before, I use the dataset of OpenDataParis reporting the number of cars going through checkpoints fixed on the city every hour.
+After my previous two studies on [traveling times in Paris](https://github.com/astyonax/TimingParis) and [traffic in Paris](https://github.com/astyonax/heartbeat-traffic) it is time to model the traffic in Paris. As before, I use the dataset of OpenDataParis reporting the number of cars going through checkpoints fixed on the city every hour.
 
 In this case, by modeling I mean finding a function `F(x(t))=x(t+1h)` to propagate forward of 1h any arbitrary state.
 For sake of learning some more tricks with `pytorch`, I'll first make an NN model based on a LSTM cell.
 
-TL;DR: **NOT** a success story yet.
+TL;DR: **NOT** a success story yet:
+[notebook here](LSTM-2.ipynb) and [full code here](lstm.py).
+
 To see: https://discuss.pytorch.org/t/lstm-time-series-prediction/4832
 
 ## The model
