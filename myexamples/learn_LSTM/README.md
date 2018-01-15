@@ -10,6 +10,11 @@ TL;DR: **NOT** a success story yet:
 
 To see: https://discuss.pytorch.org/t/lstm-time-series-prediction/4832
 
+## The data
+
+The data is a coarse grained version of the raw dataset. 
+It is a matrix ~ 300x2000  (time x features), visualized in [traffic in Paris](https://github.com/astyonax/heartbeat-traffic).
+
 ## The model
 The model, which contains the NN itself, the optimizer, the data scaler (scikit.learn's RobustScaler) and the data loader is in the file `lstm.py`.
 
