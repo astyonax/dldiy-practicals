@@ -12,7 +12,7 @@ To see: https://discuss.pytorch.org/t/lstm-time-series-prediction/4832
 
 ## The data
 
-The data is a coarse grained version of the raw dataset. 
+The data is a coarse grained version of the raw dataset.
 It is a matrix ~ 300x2000  (time x features), visualized in [traffic in Paris](https://github.com/astyonax/heartbeat-traffic).
 
 ## The model
@@ -51,8 +51,8 @@ This set of HP are then used to train up to 1e5 epochs (it's really fast, just m
 The individuals of the GEA are a dictionary of HP: window size, hidden dimensions, and weight decay.
 To evaluate their fitness I simply train the model with the given set of parameters (training is done with `Adagrad(lr=0.1)`.
 
-Learning is measured with `MSELoss` or mean-squared-error between the predicted counts and the real ones,
-validation is MSE against the average counts at fixed time.
+**Learning** is measured with `MSELoss` or mean-squared-error between the predicted counts and the real ones,
+**validation** is MSE between the average predicted and real counts at fixed time.
 
 ## Result
 
@@ -63,7 +63,7 @@ May be a sort of convolutional approach would help bcs many counters are strogly
 
 ### On the traffic
 Since there is no conservation law for number of cars though all counters, we should not expect the machine to be able to propagate forward
-an arbitrary state. This is obvious _a posteriori_ but I didn't though of it initially. 
+an arbitrary state. This is obvious _a posteriori_ but I didn't though of it initially.
 
 Even with a simple linear model $y_{t+1}=W_{t,t+1}y_t+b_t$ and enforcing that $|W|=1$, the bias has to be not zero $b_t\neq 0$ then the machine can just `learn` the number of expected cars at time $t+1$. Indeed, then it is more efficient to learn $y_{t+1}=0_{t,t+1}y_t+b_t$!
 
