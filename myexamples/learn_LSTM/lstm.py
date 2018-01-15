@@ -252,8 +252,8 @@ def main(WINDOW,HIDDEN_DIM,EPOCHS,WEIGHT_DECAY,EV=1000,prefix=''):
             fout.write(str(fitness))
 
     # return last loss (for GEA)
-    print(last_loss)
-    return last_loss
+    print(fitness)
+    return fitness
 
 if __name__ == '__main__':
     # some magic
