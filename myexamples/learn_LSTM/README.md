@@ -55,6 +55,10 @@ To evaluate their fitness I simply train the model with the given set of paramet
 **validation** is MSE between the average predicted and real counts at fixed time.
 
 ## Result
+### Average cars/counter/hour
+![](plots/average.png)
+### Cars through a single counter
+![](plots/single.png)
 
 ### On the ML
 Well.. we get that the machine does not learn the peaks, and has a rather noisy signal (see below).
